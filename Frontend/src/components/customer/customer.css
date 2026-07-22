@@ -1,0 +1,46 @@
+.nav-tabs .nav-link{
+
+    color:#666;
+
+    font-weight:500;
+
+}
+
+.nav-tabs .nav-link.active{
+
+    border-top:0;
+
+    border-left:0;
+
+    border-right:0;
+
+    border-bottom:3px solid #d39b3c;
+
+    color:#000;
+
+    font-weight:600;
+
+}
+
+.form-control,
+.form-select{
+
+    height:42px;
+
+}
+
+.btn-warning{
+
+    height:42px;
+
+    background:#c7923d;
+
+    border:none;
+
+}
+
+.btn-warning:hover{
+
+    background:#b58334;
+
+}

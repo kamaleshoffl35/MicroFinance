@@ -1,0 +1,169 @@
+body{
+    margin:0;
+    background:#f5f5f5;
+}
+
+
+
+
+.content{
+
+    flex:1;
+
+    padding:20px;
+
+    overflow:auto;
+
+}
+/* Outer Border Radius */
+.custom-grid {
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* Header */
+.custom-grid .ag-header {
+    background: #f8f9fa;
+}
+
+/* Header Cell */
+.custom-grid .ag-header-cell {
+    font-weight: 600;
+    border-right: none;
+}
+
+/* Cell */
+.custom-grid .ag-cell {
+    display: flex;
+    align-items: center;
+    border-right: none;
+}
+
+/* Row Bottom Gap */
+.custom-grid .ag-row {
+    border-bottom: 10px solid #f8f9fa;
+}
+.layout-wrapper {
+    display: flex;
+    width: 100%;
+    min-height: calc(100vh - 56px);
+}
+
+/* Sidebar */
+
+
+
+.sidebar {
+    width: 200px;
+    min-width: 200px;
+    max-width: 200px;
+
+   
+    border-right: 1px solid #ddd;
+    transition: all .3s ease;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.sidebar-close {
+    width: 0;
+    min-width: 0;
+    max-width: 0;
+}
+
+.sidebar-close{
+
+    width:0;
+
+}
+
+/* Content */
+
+.content-wrapper {
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+    padding: 20px;
+    overflow: auto;
+}
+
+
+/* Last Row */
+.custom-grid .ag-row:last-child {
+    border-bottom: none;
+}
+
+/* Pagination */
+.custom-grid .ag-paging-panel {
+    border-top: 1px solid #dee2e6;
+}
+
+.header-center .ag-header-cell-label {
+    justify-content: center;
+}
+
+.custom-grid .ag-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 15px;
+}
+
+.custom-grid .ag-row {
+    border-bottom: 8px solid #f8f9fa;
+}
+
+.card{
+
+    border-radius:14px;
+
+}
+
+.form-control,
+.form-select{
+
+    border-radius:8px;
+
+    min-height:42px;
+
+}
+
+.form-label{
+
+    font-size:14px;
+
+    font-weight:600;
+
+}
+
+.btn{
+
+    border-radius:8px;
+
+}
+
+input[type=file]{
+
+    font-size:13px;
+
+}
+
+.bg-light{
+
+    background:#fafafa !important;
+
+}
+
+.border{
+
+    border-style:dashed !important;
+
+}
+
+h5{
+
+    color:#1f2937;
+
+}
