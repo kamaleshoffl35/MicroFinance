@@ -167,3 +167,144 @@ h5{
     color:#1f2937;
 
 }
+
+.add {
+    background-color: 
+#05081F;
+
+}
+
+.docs{
+    border: 1px solid #05081F;
+    color: #05081F;
+    background: #fff;
+}
+
+.docs:hover{
+    background: #05081F;
+    color: #fff;
+}
+.add:hover,
+.add:focus,
+.add:active {
+    background-color: #05081F !important;
+    border-color: #05081F !important;
+    color: #fff !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+
+
+/* Modal Width */
+.customer-view-modal {
+  max-width: 800px;
+}
+
+/* Modal Header */
+.customer-view-modal .modal-header {
+  padding: 12px 18px;
+}
+
+.customer-view-modal .modal-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+/* Modal Body */
+.customer-view-modal .modal-body {
+  padding: 16px;
+}
+
+/* Card */
+.customer-view-modal .card-body {
+  padding: 12px;
+}
+
+/* Section Heading */
+.customer-view-modal h6 {
+  font-size: 0.95rem;
+  margin-bottom: 10px;
+}
+
+/* List Items */
+.customer-view-modal .list-group-item {
+  font-size: 0.86rem;
+  padding: 8px 10px;
+}
+
+/* Paragraphs */
+.customer-view-modal p {
+  font-size: 0.86rem;
+  margin-bottom: 8px;
+}
+
+/* Buttons */
+.customer-view-modal .btn.docs {
+  font-size: 0.82rem;
+  padding: 5px 10px;
+}
+
+/* Guarantor Address Box */
+.customer-view-modal .border.rounded {
+  font-size: 0.85rem;
+  padding: 8px !important;
+}
+
+.customer-view-modal .modal-content {
+  height: 80vh;
+}
+
+.customer-view-modal .modal-body {
+  overflow-y: auto;
+}
+
+.customer-view-modal {
+  margin-top: 70px;   /* Increase or decrease as needed */
+}
+.customer-edit-modal {
+  margin-top: 70px;   /* Increase or decrease as needed */
+}
+.customer-edit-modal .modal-content{
+    height: 80vh;      /* 75vh - 85vh adjust pannalam */
+}
+
+.customer-edit-modal .modal-body{
+    max-height: calc(80vh - 70px);
+    overflow-y: auto;
+}
+.customer-edit-modal {
+    max-width: 800px;
+}
+.customer-edit-modal .modal-dialog{
+    max-width: 700px;
+}
+.customer-edit-modal{
+    font-size: 13px;
+}
+.customer-edit-modal .modal-title{
+    font-size: 1.6rem;
+}
+
+.customer-edit-modal h3,
+.customer-edit-modal h4,
+.customer-edit-modal h5{
+    font-size: 1.2rem;
+}
+
+.customer-edit-modal h6{
+    font-size: 1rem;
+}
+.customer-edit-modal label{
+    font-size: 13px;
+    margin-bottom: 4px;
+}
+.customer-edit-modal .form-control,
+.customer-edit-modal .form-select{
+    height: 34px;
+    font-size: 13px;
+    padding: 4px 10px;
+}
+.customer-edit-modal .card-body{
+    padding: 14px;
+}

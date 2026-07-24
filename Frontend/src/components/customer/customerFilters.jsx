@@ -5,12 +5,15 @@ import CustomerBranchFilter from "./CustomerBranchFilter";
 import CustomerKycFilter from "./CustomerKycFilter";
 import CustomerButton from "./CustomerButton";
 
-function CustomerFilters({setActiveTab}) {
+function CustomerFilters({setActiveTab,search,setSearch,}) {
   return (
     <Row className="mt-3 g-2 align-items-center">
 
       <Col md={6}>
-        <CustomerSearch />
+        <CustomerSearch
+  search={search}
+  setSearch={setSearch}
+/>
       </Col>
 
       <Col md={2}>

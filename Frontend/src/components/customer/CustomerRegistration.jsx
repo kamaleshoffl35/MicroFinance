@@ -1,8 +1,23 @@
-import { useState } from "react";
-import { Container, Row, Col, Card, Form, Alert, Spinner } from "react-bootstrap";
-import { useDispatch } from "react-redux";
-import { addCustomer } from "../../redux/customerSlice";
+import { useState, useEffect } from "react";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Form,
+  Alert,
+  Spinner,
+} from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
 
+import {
+  addCustomer,
+  updateCustomer,
+  fetchCustomers,
+} from "../../redux/customerSlice";
+import CustomerBranchFilter from "../customer/CustomerBranchFilter";
+import AppSnackbar from "../../components/common/AppSnackbar";
+import { useParams, useNavigate } from "react-router-dom";
 const initialState = {
   customerName: "",
   fatherName: "",
@@ -65,19 +80,46 @@ const DOCUMENT_FIELDS = [
   { key: "panCard", label: "PAN Card" },
   { key: "passportPhoto", label: "Passport Photo" },
   { key: "signature", label: "Signature" },
-  { key: "addressProof", label: "Address Proof" },
+  // { key: "addressProof", label: "Address Proof" },
   { key: "incomeProof", label: "Income Proof" },
 ];
+const getFileName = (file) => {
+  if (!file) return "";
 
-function CustomerRegistration() {
+  if (typeof file === "string") {
+    return file.split("/").pop();
+  }
+
+  return file.name;
+};
+function CustomerRegistration({ editData, onClose }) {
   const [formData, setFormData] = useState(initialState);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const { customers } = useSelector((state) => state.customer);
+
+  const isEdit = !!editData;
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
-  const [alert, setAlert] = useState(null); // { variant: 'success' | 'danger', message: string }
+  const [alertMessage, setAlertMessage] = useState(null);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
-  // Handles both flat fields (e.g. "customerName") and nested fields
-  // (e.g. "address.city") using dot-notation in the `name` attribute.
+  useEffect(() => {
+    if (editData) {
+      setFormData({
+        ...editData,
+        dateOfBirth: editData.dateOfBirth
+          ? editData.dateOfBirth.substring(0, 10)
+          : "",
+      });
+    }
+  }, [editData]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -107,9 +149,17 @@ function CustomerRegistration() {
   const validate = () => {
     const newErrors = {};
 
-    if (!formData.customerName.trim()) {
+    // Personal Details
+    if (!formData.customerName.trim())
       newErrors.customerName = "Customer name is required";
-    }
+
+    if (!formData.fatherName.trim())
+      newErrors.fatherName = "Father name is required";
+
+    if (!formData.dateOfBirth)
+      newErrors.dateOfBirth = "Date of birth is required";
+
+    if (!formData.gender) newErrors.gender = "Gender is required";
 
     if (!formData.mobileNumber.trim()) {
       newErrors.mobileNumber = "Mobile number is required";
@@ -117,26 +167,90 @@ function CustomerRegistration() {
       newErrors.mobileNumber = "Enter a valid mobile number";
     }
 
-    if (formData.email && !/^\S+@\S+\.\S+$/.test(formData.email.trim())) {
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/^\S+@\S+\.\S+$/.test(formData.email.trim())) {
       newErrors.email = "Enter a valid email address";
     }
 
-    if (
-      formData.identity.aadhaarNumber &&
-      !/^\d{12}$/.test(formData.identity.aadhaarNumber.trim())
-    ) {
+    if (!formData.occupation.trim())
+      newErrors.occupation = "Occupation is required";
+
+    if (!formData.branch.trim()) newErrors.branch = "Branch is required";
+
+    // Address
+    if (!formData.address.doorNumber.trim())
+      newErrors["address.doorNumber"] = "Door number is required";
+
+    if (!formData.address.street.trim())
+      newErrors["address.street"] = "Street is required";
+
+    if (!formData.address.city.trim())
+      newErrors["address.city"] = "City is required";
+
+    if (!formData.address.district.trim())
+      newErrors["address.district"] = "District is required";
+
+    if (!formData.address.state.trim())
+      newErrors["address.state"] = "State is required";
+
+    if (!formData.address.pinCode.trim()) {
+      newErrors["address.pinCode"] = "PIN Code is required";
+    } else if (!/^\d{6}$/.test(formData.address.pinCode.trim())) {
+      newErrors["address.pinCode"] = "PIN Code must be 6 digits";
+    }
+
+    // Identity
+    if (!formData.identity.aadhaarNumber.trim()) {
+      newErrors["identity.aadhaarNumber"] = "Aadhaar number is required";
+    } else if (!/^\d{12}$/.test(formData.identity.aadhaarNumber.trim())) {
       newErrors["identity.aadhaarNumber"] = "Aadhaar number must be 12 digits";
     }
 
-    if (
-      formData.identity.panNumber &&
+    if (!formData.identity.panNumber.trim()) {
+      newErrors["identity.panNumber"] = "PAN number is required";
+    } else if (
       !/^[A-Za-z]{5}\d{4}[A-Za-z]$/.test(formData.identity.panNumber.trim())
     ) {
-      newErrors["identity.panNumber"] = "Enter a valid PAN number (e.g. ABCDE1234F)";
+      newErrors["identity.panNumber"] = "Enter a valid PAN number";
     }
 
-    if (formData.address.pinCode && !/^\d{6}$/.test(formData.address.pinCode.trim())) {
-      newErrors["address.pinCode"] = "PIN code must be 6 digits";
+    if (!formData.identity.drivingLicense.trim())
+      newErrors["identity.drivingLicense"] = "Driving License is required";
+
+    if (!formData.identity.voterId.trim())
+      newErrors["identity.voterId"] = "Voter ID is required";
+
+    // Bank
+    if (!formData.bank.bankName.trim())
+      newErrors["bank.bankName"] = "Bank name is required";
+
+    if (!formData.bank.accountNumber.trim())
+      newErrors["bank.accountNumber"] = "Account number is required";
+
+    if (!formData.bank.ifscCode.trim())
+      newErrors["bank.ifscCode"] = "IFSC code is required";
+
+    if (!formData.bank.branchName.trim())
+      newErrors["bank.branchName"] = "Branch name is required";
+
+    if (!formData.nominee.name.trim())
+      newErrors["nominee.name"] = "Nominee name is required";
+
+    if (!formData.nominee.relation.trim())
+      newErrors["nominee.relation"] = "Relation is required";
+
+    if (!formData.nominee.age) newErrors["nominee.age"] = "Age is required";
+
+    if (!formData.nominee.phoneNumber.trim())
+      newErrors["nominee.phoneNumber"] = "Phone number is required";
+
+    if (!isEdit) {
+      DOCUMENT_FIELDS.forEach(({ key, label }) => {
+        if (!formData.documents[key]) {
+          newErrors[`documents.${key}`] = `${label} is required`;
+        }
+      });
     }
 
     setErrors(newErrors);
@@ -146,36 +260,102 @@ function CustomerRegistration() {
   const resetForm = () => setFormData(initialState);
 
   const submitForm = async (status) => {
-    setAlert(null);
+    setAlertMessage(null);
 
     if (status !== "Draft" && !validate()) {
-      setAlert({ variant: "danger", message: "Please fix the highlighted errors before submitting." });
+      setSnackbar({
+        open: true,
+        message: "Please fill all required fields.",
+        severity: "warning",
+      });
       return;
     }
 
     setSubmitting(true);
     try {
-     await dispatch(addCustomer({ ...formData, status })).unwrap();
-      setAlert({
-        variant: "success",
+      await dispatch(addCustomer({ ...formData, status })).unwrap();
+      setSnackbar({
+        open: true,
         message:
           status === "Draft"
             ? "Draft saved successfully."
-            : "Customer registered successfully!",
+            : "Customer registered successfully.",
+        severity: "success",
       });
       resetForm();
     } catch (error) {
-      setAlert({ variant: "danger", message: error.message });
+      setSnackbar({
+        open: true,
+        message: error.message,
+        severity: "error",
+      });
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    submitForm("Active");
-  };
 
+    if (!validate()) {
+      setSnackbar({
+        open: true,
+        message: "Please fill all required fields.",
+        severity: "warning",
+      });
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      if (isEdit) {
+        await dispatch(
+          updateCustomer({
+            id: editData._id,
+            formData,
+          }),
+        ).unwrap();
+
+        setSnackbar({
+          open: true,
+          message: "Customer updated successfully.",
+          severity: "success",
+        });
+        onClose?.();
+      } else {
+        await dispatch(
+          addCustomer({
+            ...formData,
+            status: "Active",
+          }),
+        ).unwrap();
+
+        setSnackbar({
+          open: true,
+          message: "Customer registered successfully.",
+          severity: "success",
+        });
+
+        resetForm();
+        setErrors({});
+      }
+
+      setTimeout(() => {
+        navigate("/customer");
+      }, 1500);
+    } catch (err) {
+      setSnackbar({
+        open: true,
+        message: err?.message || "Something went wrong.",
+        severity: "error",
+      });
+
+      console.error(err);
+    } finally {
+      setSubmitting(false);
+    }
+  };
   const handleSaveDraft = () => {
     submitForm("Draft");
   };
@@ -183,16 +363,22 @@ function CustomerRegistration() {
   const handleCancel = () => {
     resetForm();
     setErrors({});
-    setAlert(null);
+    setAlertMessage(null);
   };
 
   return (
     <Container fluid className="mt-4">
-      {alert && (
-        <Alert variant={alert.variant} onClose={() => setAlert(null)} dismissible>
-          {alert.message}
-        </Alert>
-      )}
+      <AppSnackbar
+        open={snackbar.open}
+        message={snackbar.message}
+        severity={snackbar.severity}
+        onClose={() =>
+          setSnackbar((prev) => ({
+            ...prev,
+            open: false,
+          }))
+        }
+      />
 
       <Form onSubmit={handleSubmit} noValidate>
         <Row>
@@ -205,7 +391,9 @@ function CustomerRegistration() {
 
                 <Row>
                   <Col md={6} className="mb-3">
-                    <Form.Label>Customer Name</Form.Label>
+                    <Form.Label>
+                      Customer Name <span className="text-danger">*</span>
+                    </Form.Label>
                     <Form.Control
                       name="customerName"
                       placeholder="Enter Customer Name"
@@ -219,41 +407,65 @@ function CustomerRegistration() {
                   </Col>
 
                   <Col md={6} className="mb-3">
-                    <Form.Label>Father Name</Form.Label>
+                    <Form.Label>
+                      Father Name <span className="text-danger">*</span>
+                    </Form.Label>
                     <Form.Control
                       name="fatherName"
                       placeholder="Enter Father Name"
                       value={formData.fatherName}
                       onChange={handleChange}
+                      isInvalid={!!errors.fatherName}
                     />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.fatherName}
+                    </Form.Control.Feedback>
                   </Col>
                 </Row>
 
                 <Row>
                   <Col md={6} className="mb-3">
-                    <Form.Label>Date of Birth</Form.Label>
+                    <Form.Label>
+                      Date of Birth <span className="text-danger">*</span>
+                    </Form.Label>
                     <Form.Control
                       type="date"
                       name="dateOfBirth"
                       value={formData.dateOfBirth}
                       onChange={handleChange}
+                      isInvalid={!!errors.dateOfBirth}
                     />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.dateOfBirth}
+                    </Form.Control.Feedback>
                   </Col>
 
                   <Col md={6} className="mb-3">
-                    <Form.Label>Gender</Form.Label>
-                    <Form.Select name="gender" value={formData.gender} onChange={handleChange}>
+                    <Form.Label>
+                      Gender <span className="text-danger">*</span>
+                    </Form.Label>
+                    <Form.Select
+                      name="gender"
+                      value={formData.gender}
+                      onChange={handleChange}
+                      isInvalid={!!errors.gender}
+                    >
                       <option value="">Select Gender</option>
                       <option>Male</option>
                       <option>Female</option>
                       <option>Other</option>
                     </Form.Select>
+                    <Form.Control.Feedback type="invalid">
+                      {errors.gender}
+                    </Form.Control.Feedback>
                   </Col>
                 </Row>
 
                 <Row>
                   <Col md={6} className="mb-3">
-                    <Form.Label>Mobile Number</Form.Label>
+                    <Form.Label>
+                      Mobile Number <span className="text-danger">*</span>
+                    </Form.Label>
                     <Form.Control
                       name="mobileNumber"
                       placeholder="+91 xxxxxxxxxx"
@@ -267,7 +479,9 @@ function CustomerRegistration() {
                   </Col>
 
                   <Col md={6} className="mb-3">
-                    <Form.Label>Email</Form.Label>
+                    <Form.Label>
+                      Email <span className="text-danger">*</span>
+                    </Form.Label>
                     <Form.Control
                       type="email"
                       name="email"
@@ -276,19 +490,27 @@ function CustomerRegistration() {
                       onChange={handleChange}
                       isInvalid={!!errors.email}
                     />
-                    <Form.Control.Feedback type="invalid">{errors.email}</Form.Control.Feedback>
+                    <Form.Control.Feedback type="invalid">
+                      {errors.email}
+                    </Form.Control.Feedback>
                   </Col>
                 </Row>
 
                 <Row>
                   <Col md={6} className="mb-3">
-                    <Form.Label>Occupation</Form.Label>
+                    <Form.Label>
+                      Occupation <span className="text-danger">*</span>
+                    </Form.Label>
                     <Form.Control
                       name="occupation"
                       placeholder="Occupation"
                       value={formData.occupation}
                       onChange={handleChange}
+                      isInvalid={!!errors.occupation}
                     />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.occupation}
+                    </Form.Control.Feedback>
                   </Col>
 
                   <Col md={6} className="mb-3">
@@ -320,13 +542,19 @@ function CustomerRegistration() {
                   </Col>
 
                   <Col md={6}>
-                    <Form.Label>Branch</Form.Label>
+                    <Form.Label>
+                      Branch <span className="text-danger">*</span>
+                    </Form.Label>
                     <Form.Control
                       name="branch"
                       placeholder="Branch Name"
                       value={formData.branch}
                       onChange={handleChange}
+                      isInvalid={!!errors.branch}
                     />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.branch}
+                    </Form.Control.Feedback>
                   </Col>
                 </Row>
               </Card.Body>
@@ -335,27 +563,41 @@ function CustomerRegistration() {
             {/* Address Details */}
             <Card className="shadow-sm border-0 rounded-4 mb-4">
               <Card.Body>
-                <h5 className="fw-bold mb-4">Address Details</h5>
+                <h5 className="fw-bold mb-4">
+                  Address Details <span className="text-danger">*</span>
+                </h5>
 
                 <Row>
                   <Col md={4} className="mb-3">
-                    <Form.Label>Door Number</Form.Label>
+                    <Form.Label>
+                      Door Number <span className="text-danger">*</span>
+                    </Form.Label>
                     <Form.Control
                       name="address.doorNumber"
                       placeholder="Door No"
                       value={formData.address.doorNumber}
                       onChange={handleChange}
+                      isInvalid={!!errors["address.doorNumber"]}
                     />
+                    <Form.Control.Feedback type="invalid">
+                      {errors["address.doorNumber"]}
+                    </Form.Control.Feedback>
                   </Col>
 
                   <Col md={8} className="mb-3">
-                    <Form.Label>Street</Form.Label>
+                    <Form.Label>
+                      Street <span className="text-danger">*</span>
+                    </Form.Label>
                     <Form.Control
                       name="address.street"
                       placeholder="Street Name"
                       value={formData.address.street}
                       onChange={handleChange}
+                      isInvalid={!!errors["address.street"]}
                     />
+                    <Form.Control.Feedback type="invalid">
+                      {errors["address.street"]}
+                    </Form.Control.Feedback>
                   </Col>
                 </Row>
 
@@ -371,39 +613,59 @@ function CustomerRegistration() {
                   </Col>
 
                   <Col md={6} className="mb-3">
-                    <Form.Label>City</Form.Label>
+                    <Form.Label>
+                      City <span className="text-danger">*</span>
+                    </Form.Label>
                     <Form.Control
                       name="address.city"
                       placeholder="City"
                       value={formData.address.city}
                       onChange={handleChange}
+                      isInvalid={!!errors["address.city"]}
                     />
+                    <Form.Control.Feedback type="invalid">
+                      {errors["address.city"]}
+                    </Form.Control.Feedback>
                   </Col>
                 </Row>
 
                 <Row>
                   <Col md={6} className="mb-3">
-                    <Form.Label>District</Form.Label>
+                    <Form.Label>
+                      District <span className="text-danger">*</span>
+                    </Form.Label>
                     <Form.Control
                       name="address.district"
                       placeholder="District"
                       value={formData.address.district}
                       onChange={handleChange}
+                      isInvalid={!!errors["address.district"]}
                     />
+                    <Form.Control.Feedback type="invalid">
+                      {errors["address.district"]}
+                    </Form.Control.Feedback>
                   </Col>
 
                   <Col md={3} className="mb-3">
-                    <Form.Label>State</Form.Label>
+                    <Form.Label>
+                      State <span className="text-danger">*</span>
+                    </Form.Label>
                     <Form.Control
                       name="address.state"
                       placeholder="State"
                       value={formData.address.state}
                       onChange={handleChange}
+                      isInvalid={!!errors["address.state"]}
                     />
+                    <Form.Control.Feedback type="invalid">
+                      {errors["address.state"]}
+                    </Form.Control.Feedback>
                   </Col>
 
                   <Col md={3} className="mb-3">
-                    <Form.Label>PIN Code</Form.Label>
+                    <Form.Label>
+                      PIN Code <span className="text-danger">*</span>
+                    </Form.Label>
                     <Form.Control
                       name="address.pinCode"
                       placeholder="PIN Code"
@@ -426,7 +688,9 @@ function CustomerRegistration() {
 
                 <Row>
                   <Col md={6} className="mb-3">
-                    <Form.Label>Aadhaar Number</Form.Label>
+                    <Form.Label>
+                      Aadhaar Number <span className="text-danger">*</span>
+                    </Form.Label>
                     <Form.Control
                       name="identity.aadhaarNumber"
                       placeholder="XXXX XXXX XXXX"
@@ -440,7 +704,9 @@ function CustomerRegistration() {
                   </Col>
 
                   <Col md={6} className="mb-3">
-                    <Form.Label>PAN Number</Form.Label>
+                    <Form.Label>
+                      PAN Number <span className="text-danger">*</span>
+                    </Form.Label>
                     <Form.Control
                       name="identity.panNumber"
                       placeholder="ABCDE1234F"
@@ -456,23 +722,35 @@ function CustomerRegistration() {
 
                 <Row>
                   <Col md={6} className="mb-3">
-                    <Form.Label>Driving License</Form.Label>
+                    <Form.Label>
+                      Driving License <span className="text-danger">*</span>
+                    </Form.Label>
                     <Form.Control
                       name="identity.drivingLicense"
                       placeholder="DL Number"
                       value={formData.identity.drivingLicense}
                       onChange={handleChange}
+                      isInvalid={!!errors["identity.drivingLicense"]}
                     />
+                    <Form.Control.Feedback type="invalid">
+                      {errors["identity.drivingLicense"]}
+                    </Form.Control.Feedback>
                   </Col>
 
                   <Col md={6} className="mb-3">
-                    <Form.Label>Voter ID</Form.Label>
+                    <Form.Label>
+                      Voter ID <span className="text-danger">*</span>
+                    </Form.Label>
                     <Form.Control
                       name="identity.voterId"
                       placeholder="Voter ID"
                       value={formData.identity.voterId}
                       onChange={handleChange}
+                      isInvalid={!!errors["identity.voterId"]}
                     />
+                    <Form.Control.Feedback type="invalid">
+                      {errors["identity.voterId"]}
+                    </Form.Control.Feedback>
                   </Col>
                 </Row>
               </Card.Body>
@@ -485,45 +763,69 @@ function CustomerRegistration() {
 
                 <Row>
                   <Col md={6} className="mb-3">
-                    <Form.Label>Bank Name</Form.Label>
+                    <Form.Label>
+                      Bank Name <span className="text-danger">*</span>
+                    </Form.Label>
                     <Form.Control
                       name="bank.bankName"
                       placeholder="Bank Name"
                       value={formData.bank.bankName}
                       onChange={handleChange}
+                      isInvalid={!!errors["bank.bankName"]}
                     />
+                    <Form.Control.Feedback type="invalid">
+                      {errors["bank.bankName"]}
+                    </Form.Control.Feedback>
                   </Col>
 
                   <Col md={6} className="mb-3">
-                    <Form.Label>Account Number</Form.Label>
+                    <Form.Label>
+                      Account Number <span className="text-danger">*</span>
+                    </Form.Label>
                     <Form.Control
                       name="bank.accountNumber"
                       placeholder="Account Number"
                       value={formData.bank.accountNumber}
                       onChange={handleChange}
+                      isInvalid={!!errors["bank.accountNumber"]}
                     />
+                    <Form.Control.Feedback type="invalid">
+                      {errors["bank.accountNumber"]}
+                    </Form.Control.Feedback>
                   </Col>
                 </Row>
 
                 <Row>
                   <Col md={6} className="mb-3">
-                    <Form.Label>IFSC Code</Form.Label>
+                    <Form.Label>
+                      IFSC Code <span className="text-danger">*</span>
+                    </Form.Label>
                     <Form.Control
                       name="bank.ifscCode"
                       placeholder="IFSC Code"
                       value={formData.bank.ifscCode}
                       onChange={handleChange}
+                      isInvalid={!!errors["bank.ifscCode"]}
                     />
+                    <Form.Control.Feedback type="invalid">
+                      {errors["bank.ifscCode"]}
+                    </Form.Control.Feedback>
                   </Col>
 
                   <Col md={6} className="mb-3">
-                    <Form.Label>Branch Name</Form.Label>
+                    <Form.Label>
+                      Branch Name <span className="text-danger">*</span>
+                    </Form.Label>
                     <Form.Control
                       name="bank.branchName"
                       placeholder="Branch Name"
                       value={formData.bank.branchName}
                       onChange={handleChange}
+                      isInvalid={!!errors["bank.branchName"]}
                     />
+                    <Form.Control.Feedback type="invalid">
+                      {errors["bank.branchName"]}
+                    </Form.Control.Feedback>
                   </Col>
                 </Row>
               </Card.Body>
@@ -539,29 +841,43 @@ function CustomerRegistration() {
 
                 <Row>
                   <Col md={6} className="mb-3">
-                    <Form.Label>Nominee Name</Form.Label>
+                    <Form.Label>
+                      Nominee Name <span className="text-danger">*</span>
+                    </Form.Label>
                     <Form.Control
                       name="nominee.name"
                       placeholder="Nominee Name"
                       value={formData.nominee.name}
                       onChange={handleChange}
+                      isInvalid={!!errors["nominee.name"]}
                     />
+                    <Form.Control.Feedback type="invalid">
+                      {errors["nominee.name"]}
+                    </Form.Control.Feedback>
                   </Col>
 
                   <Col md={6} className="mb-3">
-                    <Form.Label>Relation</Form.Label>
+                    <Form.Label>
+                      Relation <span className="text-danger">*</span>
+                    </Form.Label>
                     <Form.Control
                       name="nominee.relation"
                       placeholder="Relation"
                       value={formData.nominee.relation}
                       onChange={handleChange}
+                      isInvalid={!!errors["nominee.relation"]}
                     />
+                    <Form.Control.Feedback type="invalid">
+                      {errors["nominee.relation"]}
+                    </Form.Control.Feedback>
                   </Col>
                 </Row>
 
                 <Row>
                   <Col md={6} className="mb-3">
-                    <Form.Label>Age</Form.Label>
+                    <Form.Label>
+                      Age <span className="text-danger">*</span>
+                    </Form.Label>
                     <Form.Control
                       type="number"
                       min="0"
@@ -569,17 +885,27 @@ function CustomerRegistration() {
                       placeholder="Age"
                       value={formData.nominee.age}
                       onChange={handleChange}
+                      isInvalid={!!errors["nominee.age"]}
                     />
+                    <Form.Control.Feedback type="invalid">
+                      {errors["nominee.age"]}
+                    </Form.Control.Feedback>
                   </Col>
 
                   <Col md={6} className="mb-3">
-                    <Form.Label>Phone Number</Form.Label>
+                    <Form.Label>
+                      Phone Number <span className="text-danger">*</span>
+                    </Form.Label>
                     <Form.Control
                       name="nominee.phoneNumber"
                       placeholder="+91 xxxxxxxxxx"
                       value={formData.nominee.phoneNumber}
                       onChange={handleChange}
+                      isInvalid={!!errors["nominee.phoneNumber"]}
                     />
+                    <Form.Control.Feedback type="invalid">
+                      {errors["nominee.phoneNumber"]}
+                    </Form.Control.Feedback>
                   </Col>
                 </Row>
               </Card.Body>
@@ -661,16 +987,21 @@ function CustomerRegistration() {
                   {DOCUMENT_FIELDS.map(({ key, label }) => (
                     <Col md={6} key={key}>
                       <div className="border rounded-3 p-4 text-center bg-light">
-                        <h6>{label}</h6>
+                        <h6>
+                          {label} <span className="text-danger">*</span>
+                        </h6>
                         <Form.Control
                           type="file"
                           name={key}
                           accept=".jpg,.jpeg,.png,.pdf"
                           onChange={handleFileChange}
                         />
+
                         {formData.documents[key] && (
-                          <div className="small text-muted mt-1 text-truncate">
-                            {formData.documents[key].name}
+                          <div className="small mt-2 text-success text-truncate">
+                            Selected:
+                            <br />
+                            {getFileName(formData.documents[key])}
                           </div>
                         )}
                       </div>
@@ -695,15 +1026,29 @@ function CustomerRegistration() {
 
           <button
             type="button"
-            className="btn btn-warning px-4 text-white"
+            className="btn add px-4 text-white"
             onClick={handleSaveDraft}
             disabled={submitting}
           >
-            {submitting ? <Spinner animation="border" size="sm" /> : "Save Draft"}
+            {submitting ? (
+              <Spinner animation="border" size="sm" />
+            ) : (
+              "Save Draft"
+            )}
           </button>
 
-          <button type="submit" className="btn btn-success px-4" disabled={submitting}>
-            {submitting ? <Spinner animation="border" size="sm" /> : "Register Customer"}
+          <button
+            type="submit"
+            className="btn add text-white px-4"
+            disabled={submitting}
+          >
+            {submitting ? (
+              <Spinner animation="border" size="sm" />
+            ) : isEdit ? (
+              "Update Customer"
+            ) : (
+              "Register Customer"
+            )}
           </button>
         </div>
       </Form>

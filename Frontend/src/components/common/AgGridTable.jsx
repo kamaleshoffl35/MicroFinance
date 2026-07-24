@@ -1,4 +1,5 @@
 import { AgGridReact } from "ag-grid-react";
+import { FaEye, FaEdit, FaTrash } from "react-icons/fa";
 
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
@@ -7,22 +8,58 @@ function AgGridTable({
   rowData,
   columnDefs,
   height = "500px",
+  showActions = false,
+  onView,
+  onEdit,
+  onDelete,
 }) {
   const defaultColDef = {
-  flex: 1,
-  sortable: true,
-  filter: true,
-  floatingFilter: true,
-  resizable: true,
+    flex: 1,
+    sortable: true,
+    filter: true,
+    floatingFilter: true,
+    resizable: true,
+    cellStyle: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    headerClass: "header-center",
+  };
 
-  cellStyle: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  const actionColumn = {
+    headerName: "Actions",
+    field: "actions",
+    sortable: false,
+    filter: false,
+    floatingFilter: false,
+    width: 150,
+    cellRenderer: (params) => (
+      <div className="d-flex gap-3">
+        <FaEye
+          style={{ cursor: "pointer", color: "#0d6efd" }}
+          title="View"
+          onClick={() => onView?.(params.data)}
+        />
 
-  headerClass: "header-center",
-};
+        <FaEdit
+          style={{ cursor: "pointer", color: "#198754" }}
+          title="Edit"
+          onClick={() => onEdit?.(params.data)}
+        />
+
+        <FaTrash
+          style={{ cursor: "pointer", color: "#dc3545" }}
+          title="Delete"
+          onClick={() => onDelete?.(params.data)}
+        />
+      </div>
+    ),
+  };
+
+  const finalColumnDefs = showActions
+    ? [...columnDefs, actionColumn]
+    : columnDefs;
 
   return (
     <div
@@ -34,14 +71,12 @@ function AgGridTable({
     >
       <AgGridReact
         rowData={rowData}
-        columnDefs={columnDefs}
+        columnDefs={finalColumnDefs}
         defaultColDef={defaultColDef}
-        rowHeight={55}
-        headerHeight={50}
+        rowHeight={60}
+        headerHeight={55}
         pagination={true}
         paginationPageSize={10}
-        rowHeight={60}
-    headerHeight={55}
         paginationPageSizeSelector={[5, 10, 20, 50, 100]}
       />
     </div>

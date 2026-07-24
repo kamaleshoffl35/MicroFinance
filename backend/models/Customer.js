@@ -2,12 +2,11 @@ const mongoose = require("mongoose");
 
 const customerSchema = new mongoose.Schema(
   {
-    
     customerId: {
-  type: String,
-  unique: true,
-  required: true,
-},
+      type: String,
+      unique: true,
+      required: true,
+    },
     customerName: {
       type: String,
       required: [true, "Customer name is required"],
@@ -51,7 +50,6 @@ const customerSchema = new mongoose.Schema(
       default: "",
     },
 
-   
     address: {
       doorNumber: { type: String, trim: true },
       street: { type: String, trim: true },
@@ -66,7 +64,6 @@ const customerSchema = new mongoose.Schema(
       },
     },
 
-    
     identity: {
       aadhaarNumber: {
         type: String,
@@ -83,7 +80,6 @@ const customerSchema = new mongoose.Schema(
       voterId: { type: String, trim: true },
     },
 
-   
     bank: {
       bankName: { type: String, trim: true },
       accountNumber: { type: String, trim: true },
@@ -91,7 +87,6 @@ const customerSchema = new mongoose.Schema(
       branchName: { type: String, trim: true },
     },
 
-   
     nominee: {
       name: { type: String, trim: true },
       relation: { type: String, trim: true },
@@ -107,18 +102,16 @@ const customerSchema = new mongoose.Schema(
       address: { type: String, trim: true },
     },
 
-
     documents: {
       aadhaarFront: { type: String, default: null },
       aadhaarBack: { type: String, default: null },
       panCard: { type: String, default: null },
       passportPhoto: { type: String, default: null },
       signature: { type: String, default: null },
-      addressProof: { type: String, default: null },
+
       incomeProof: { type: String, default: null },
     },
 
-  
     kycStatus: {
       type: String,
       enum: ["Pending", "Verified", "Rejected"],
@@ -135,8 +128,8 @@ const customerSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true, 
-  }
+    timestamps: true,
+  },
 );
 
 module.exports = mongoose.model("Customer", customerSchema);
