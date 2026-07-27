@@ -12,6 +12,7 @@ function AgGridTable({
   onView,
   onEdit,
   onDelete,
+  actionRenderer,
 }) {
   const defaultColDef = {
     flex: 1,
@@ -34,27 +35,33 @@ function AgGridTable({
     filter: false,
     floatingFilter: false,
     width: 150,
-    cellRenderer: (params) => (
-      <div className="d-flex gap-3">
-        <FaEye
-          style={{ cursor: "pointer", color: "#0d6efd" }}
-          title="View"
-          onClick={() => onView?.(params.data)}
-        />
+    cellRenderer: (params) => {
+      if (actionRenderer) {
+        return actionRenderer(params);
+      }
 
-        <FaEdit
-          style={{ cursor: "pointer", color: "#198754" }}
-          title="Edit"
-          onClick={() => onEdit?.(params.data)}
-        />
+      return (
+        <div className="d-flex gap-3">
+          <FaEye
+            style={{ cursor: "pointer", color: "#0d6efd" }}
+            title="View"
+            onClick={() => onView?.(params.data)}
+          />
 
-        <FaTrash
-          style={{ cursor: "pointer", color: "#dc3545" }}
-          title="Delete"
-          onClick={() => onDelete?.(params.data)}
-        />
-      </div>
-    ),
+          <FaEdit
+            style={{ cursor: "pointer", color: "#198754" }}
+            title="Edit"
+            onClick={() => onEdit?.(params.data)}
+          />
+
+          <FaTrash
+            style={{ cursor: "pointer", color: "#dc3545" }}
+            title="Delete"
+            onClick={() => onDelete?.(params.data)}
+          />
+        </div>
+      );
+    },
   };
 
   const finalColumnDefs = showActions
@@ -63,7 +70,7 @@ function AgGridTable({
 
   return (
     <div
-      className="ag-theme-alpine custom-grid mt-3"
+      className="ag-theme-alpine custom-grid mt-3 border rounded-2 p-3"
       style={{
         height,
         width: "100%",

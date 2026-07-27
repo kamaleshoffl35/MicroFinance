@@ -1,6 +1,5 @@
 const Customer = require("../models/Customer");
 
-
 const asyncHandler = (fn) => (req, res, next) =>
   Promise.resolve(fn(req, res, next)).catch(next);
 const parseNestedField = (field) => {
@@ -24,26 +23,23 @@ const buildDocumentPaths = (files) => {
   return documents;
 };
 
-
 const createCustomer = asyncHandler(async (req, res) => {
   const body = req.body;
- 
-const lastCustomer = await Customer.findOne()
-  .sort({ createdAt: -1 })
-  .select("customerId");
 
+  const lastCustomer = await Customer.findOne()
+    .sort({ createdAt: -1 })
+    .select("customerId");
 
-let customerId = "CUST0001";
+  let customerId = "CUST0001";
 
-if (lastCustomer && lastCustomer.customerId) {
-  const lastNumber = parseInt(
-    lastCustomer.customerId.replace("CUST", ""),
-    10
-  );
+  if (lastCustomer && lastCustomer.customerId) {
+    const lastNumber = parseInt(
+      lastCustomer.customerId.replace("CUST", ""),
+      10,
+    );
 
-  customerId = `CUST${String(lastNumber + 1).padStart(4, "0")}`;
-}
-
+    customerId = `CUST${String(lastNumber + 1).padStart(4, "0")}`;
+  }
 
   const customerData = {
     customerId,
@@ -78,7 +74,6 @@ if (lastCustomer && lastCustomer.customerId) {
     data: customer,
   });
 });
-
 
 const getCustomers = asyncHandler(async (req, res) => {
   const { search, branch, kycStatus, page = 1, limit = 20 } = req.query;
@@ -122,7 +117,6 @@ const getCustomers = asyncHandler(async (req, res) => {
   });
 });
 
-
 const getCustomerById = asyncHandler(async (req, res) => {
   const customer = await Customer.findById(req.params.id);
 
@@ -133,7 +127,6 @@ const getCustomerById = asyncHandler(async (req, res) => {
 
   res.status(200).json({ success: true, data: customer });
 });
-
 
 const updateCustomer = asyncHandler(async (req, res) => {
   const customer = await Customer.findById(req.params.id);
@@ -157,6 +150,7 @@ const updateCustomer = asyncHandler(async (req, res) => {
     "maritalStatus",
     "branch",
     "status",
+    "remarks",
     "kycStatus",
   ];
 
@@ -187,7 +181,6 @@ const updateCustomer = asyncHandler(async (req, res) => {
     data: updatedCustomer,
   });
 });
-
 
 const deleteCustomer = asyncHandler(async (req, res) => {
   const customer = await Customer.findById(req.params.id);

@@ -117,6 +117,10 @@ const customerSchema = new mongoose.Schema(
       enum: ["Pending", "Verified", "Rejected"],
       default: "Pending",
     },
+    remarks: {
+      type: String,
+      default: "",
+    },
     branch: {
       type: String,
       trim: true,

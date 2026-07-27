@@ -19,7 +19,7 @@ import {
   ListGroup,
 } from "react-bootstrap";
 import Badge from "react-bootstrap/Badge";
-function CustomerTable({ setShowModal, setSelectedCustomer,search }) {
+function CustomerTable({ setShowModal, setSelectedCustomer, search }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { customers, loading } = useSelector((state) => state.customer);
@@ -62,14 +62,14 @@ function CustomerTable({ setShowModal, setSelectedCustomer,search }) {
     }
   };
   const filteredCustomers = customers.filter((customer) => {
-  const keyword = search.toLowerCase();
+    const keyword = search.toLowerCase();
 
-  return (
-    customer.customerName?.toLowerCase().includes(keyword) ||
-    customer.mobileNumber?.toLowerCase().includes(keyword) ||
-    customer.customerId?.toLowerCase().includes(keyword)
-  );
-});
+    return (
+      customer.customerName?.toLowerCase().includes(keyword) ||
+      customer.mobileNumber?.toLowerCase().includes(keyword) ||
+      customer.customerId?.toLowerCase().includes(keyword)
+    );
+  });
   const columnDefs = [
     {
       headerName: "Customer ID",
@@ -91,6 +91,30 @@ function CustomerTable({ setShowModal, setSelectedCustomer,search }) {
       headerName: "KYC",
       field: "kycStatus",
       cellRenderer: (params) => getStatusBadge(params.value),
+    },
+    {
+      headerName: "Remarks",
+      field: "remarks",
+      flex: 2,
+      cellRenderer: (params) => {
+        if (params.data.kycStatus !== "Rejected") return "-";
+
+        return (
+          <div>
+            <div>{params.value}</div>
+
+            <button
+              className="btn btn-sm btn-outline-primary mt-2"
+              onClick={() => {
+                setSelectedCustomer(params.data);
+                setShowModal(true);
+              }}
+            >
+              Reupload
+            </button>
+          </div>
+        );
+      },
     },
     {
       headerName: "Status",
