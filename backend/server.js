@@ -8,6 +8,7 @@ const morgan = require("morgan");
 
 const connectDB = require("./config/db");
 const customerRoutes = require("./routes/customerRoutes");
+const loanRoutes = require("./routes/loanRoutes")
 const { notFound, errorHandler } = require("./middleware/errorHandler");
 
 connectDB();
@@ -43,7 +44,7 @@ app.get("/api/health", (req, res) => {
 });
 
 app.use("/api/customers", customerRoutes);
-
+app.use("/api/loans", loanRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

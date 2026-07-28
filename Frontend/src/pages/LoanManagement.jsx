@@ -3,7 +3,7 @@ import { useState } from "react";
 import LoanHeader from "../components/loan/LoanHeader";
 import LoanFilters from "../components/loan/LoanFilters";
 import LoanTable from "../components/loan/LoanTable";
-
+import LoanApplication from "../components/loan/LoanApplication";
 function LoanManagement() {
 
   const [activeTab, setActiveTab] = useState("list");
@@ -36,6 +36,9 @@ function LoanManagement() {
           />
         </>
       )}
+      {activeTab === "application" && (
+    <LoanApplication />
+)}
 
     </div>
   );
