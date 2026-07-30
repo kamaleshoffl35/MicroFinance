@@ -2,6 +2,10 @@ const mongoose = require("mongoose");
 
 const loanSchema = new mongoose.Schema(
   {
+      loanId: {
+    type: String,
+    unique: true,
+  },
     customer: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Customer",

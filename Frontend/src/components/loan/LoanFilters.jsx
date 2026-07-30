@@ -5,10 +5,16 @@ import LoanTypeFilter from "./LoanTypeFilter";
 import LoanStatusFilter from "./LoanStatusFilter";
 import LoanButton from "./LoanButton";
 
-function LoanFilters({ search, setSearch, setActiveTab }) {
+function LoanFilters({
+  search,
+  setSearch,
+  setActiveTab,
+  setShowModal,
+  setSelectedLoan,
+}) {
   return (
-    <Row className="mt-3 g-2 align-items-center">
-      <Col md={6}>
+    <Row className="mt-3 align-items-center g-3">
+      <Col md={5}>
         <LoanSearch search={search} setSearch={setSearch} />
       </Col>
 
@@ -20,8 +26,11 @@ function LoanFilters({ search, setSearch, setActiveTab }) {
         <LoanStatusFilter />
       </Col>
 
-      <Col md={2}>
-        <LoanButton setActiveTab={setActiveTab} />
+      <Col md={3} className="d-grid">
+        <LoanButton
+          setShowModal={setShowModal}
+          setSelectedLoan={setSelectedLoan}
+        />
       </Col>
     </Row>
   );

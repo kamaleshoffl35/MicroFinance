@@ -8,7 +8,9 @@ const morgan = require("morgan");
 
 const connectDB = require("./config/db");
 const customerRoutes = require("./routes/customerRoutes");
-const loanRoutes = require("./routes/loanRoutes")
+const loanRoutes = require("./routes/loanRoutes");
+const loanTypeRoutes = require("./routes/loanTypeRoutes");
+const tenureRoutes = require("./routes/tenureRoutes");
 const { notFound, errorHandler } = require("./middleware/errorHandler");
 
 connectDB();
@@ -23,7 +25,7 @@ app.use(
   cors({
     origin: allowedOrigins,
     credentials: true,
-  })
+  }),
 );
 
 app.use(express.json());
@@ -33,10 +35,9 @@ if (process.env.NODE_ENV !== "production") {
   app.use(morgan("dev"));
 }
 
-
 app.use(
   "/uploads",
-  express.static(path.join(__dirname, process.env.UPLOAD_DIR || "uploads"))
+  express.static(path.join(__dirname, process.env.UPLOAD_DIR || "uploads")),
 );
 
 app.get("/api/health", (req, res) => {
@@ -45,6 +46,8 @@ app.get("/api/health", (req, res) => {
 
 app.use("/api/customers", customerRoutes);
 app.use("/api/loans", loanRoutes);
+app.use("/api/loan-types", loanTypeRoutes);
+app.use("/api/tenures", tenureRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
@@ -52,5 +55,7 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server running in ${process.env.NODE_ENV || "development"} mode on port ${PORT}`);
+  console.log(
+    `Server running in ${process.env.NODE_ENV || "development"} mode on port ${PORT}`,
+  );
 });

@@ -1,8 +1,14 @@
 import Button from "react-bootstrap/Button";
 
-function LoanButton() {
+function LoanButton({ setShowModal, setSelectedLoan }) {
   return (
-    <Button variant="" className="w-100 add text-white">
+    <Button
+      className="add shadow-none"
+      onClick={() => {
+        setSelectedLoan(null);
+        setShowModal(true);
+      }}
+    >
       New Loan
     </Button>
   );

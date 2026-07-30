@@ -54,7 +54,9 @@ body{
     font-size:14px;
     font-weight:600;
 }
-
+.document-preview-modal {
+  max-width: 650px;
+}
 .btn{
 
     border-radius:8px;

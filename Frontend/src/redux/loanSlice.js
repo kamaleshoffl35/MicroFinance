@@ -7,14 +7,12 @@ export const createLoan = createAsyncThunk(
     try {
       const body = new FormData();
 
-      // Normal Fields
       Object.keys(loanData).forEach((key) => {
         if (key !== "goldPhoto" && key !== "vehiclePhoto") {
           body.append(key, loanData[key]);
         }
       });
 
-      // Images
       if (loanData.goldPhoto) {
         body.append("goldPhoto", loanData.goldPhoto);
       }
@@ -27,11 +25,9 @@ export const createLoan = createAsyncThunk(
 
       return res.data.data;
     } catch (err) {
-      return rejectWithValue(
-        err.response?.data?.message || err.message
-      );
+      return rejectWithValue(err.response?.data?.message || err.message);
     }
-  }
+  },
 );
 export const fetchLoans = createAsyncThunk(
   "loan/fetchLoans",
@@ -41,11 +37,49 @@ export const fetchLoans = createAsyncThunk(
 
       return res.data.data;
     } catch (err) {
-      return rejectWithValue(
-        err.response?.data?.message || err.message
-      );
+      return rejectWithValue(err.response?.data?.message || err.message);
     }
-  }
+  },
+);
+export const deleteLoan = createAsyncThunk(
+  "loan/deleteLoan",
+  async (id, { rejectWithValue }) => {
+    try {
+      await axios.delete(`/loans/${id}`);
+
+      return id;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  },
+);
+
+export const updateLoan = createAsyncThunk(
+  "loan/updateLoan",
+  async ({ id, loanData }, { rejectWithValue }) => {
+    try {
+      const body = new FormData();
+      Object.keys(loanData).forEach((key) => {
+        if (key !== "goldPhoto" && key !== "vehiclePhoto") {
+          body.append(key, loanData[key]);
+        }
+      });
+
+      if (loanData.goldPhoto instanceof File) {
+        body.append("goldPhoto", loanData.goldPhoto);
+      }
+
+      if (loanData.vehiclePhoto instanceof File) {
+        body.append("vehiclePhoto", loanData.vehiclePhoto);
+      }
+
+      const res = await axios.put(`/loans/${id}`, body);
+
+      return res.data.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  },
 );
 const loanSlice = createSlice({
   name: "loan",
@@ -60,32 +94,49 @@ const loanSlice = createSlice({
 
   extraReducers: (builder) => {
     builder
-  .addCase(fetchLoans.pending, (state) => {
-      state.loading = true;
-    })
+      .addCase(fetchLoans.pending, (state) => {
+        state.loading = true;
+      })
 
-    .addCase(fetchLoans.fulfilled, (state, action) => {
-      state.loading = false;
-      state.loans = action.payload;
-    })
+      .addCase(fetchLoans.fulfilled, (state, action) => {
+        state.loading = false;
+        state.loans = action.payload;
+      })
 
-    .addCase(fetchLoans.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    })
+      .addCase(fetchLoans.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
 
       .addCase(createLoan.pending, (state) => {
         state.loading = true;
       })
 
       .addCase(createLoan.fulfilled, (state, action) => {
+        console.log("create payload", action.payload);
+
         state.loading = false;
-        state.loans.unshift(action.payload);
+
+        if (action.payload) {
+          state.loans.unshift(action.payload);
+        }
       })
 
       .addCase(createLoan.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(deleteLoan.fulfilled, (state, action) => {
+        state.loans = state.loans.filter((loan) => loan._id !== action.payload);
+      })
+      .addCase(updateLoan.fulfilled, (state, action) => {
+        const index = state.loans.findIndex(
+          (loan) => loan._id === action.payload._id,
+        );
+
+        if (index !== -1) {
+          state.loans[index] = action.payload;
+        }
       });
   },
 });
