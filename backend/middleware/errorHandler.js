@@ -1,3 +1,5 @@
+const ApiError = require('../utils/ApiError');
+
 
 const notFound = (req, res, next) => {
   const error = new Error(`Route not found - ${req.originalUrl}`);
@@ -5,34 +7,40 @@ const notFound = (req, res, next) => {
   next(error);
 };
 
-
 const errorHandler = (err, req, res, next) => {
-  let statusCode = res.statusCode === 200 ? 500 : res.statusCode;
-  let message = err.message || "Server Error";
+  let statusCode = res.statusCode && res.statusCode !== 200 ? res.statusCode : 500;
+  let message = err.message || 'Server Error';
+  let details;
 
-  if (err.name === "CastError" && err.kind === "ObjectId") {
+  if (err instanceof ApiError) {
+
+    statusCode = err.statusCode;
+    message = err.message;
+    details = err.details || undefined;
+  } else if (err.name === 'CastError' && err.kind === 'ObjectId') {
     statusCode = 404;
-    message = "Customer not found";
-  }
-
-
-  if (err.name === "ValidationError") {
+    const field = err.path ? err.path.charAt(0).toUpperCase() + err.path.slice(1) : 'Resource';
+    message = `${field} not found`;
+  } else if (err.name === 'ValidationError') {
     statusCode = 400;
     message = Object.values(err.errors)
       .map((val) => val.message)
-      .join(", ");
+      .join(', ');
+  } else if (err.code === 11000) {
+    statusCode = 400;
+    const field = Object.keys(err.keyValue || {}).join(', ');
+    message = `Duplicate value entered for field: ${field}`;
   }
 
-  if (err.code === 11000) {
-    statusCode = 400;
-    const field = Object.keys(err.keyValue || {}).join(", ");
-    message = `Duplicate value entered for field: ${field}`;
+  if (process.env.NODE_ENV !== 'production') {
+    console.error(err);
   }
 
   res.status(statusCode).json({
     success: false,
     message,
-    stack: process.env.NODE_ENV === "production" ? undefined : err.stack,
+    details,
+    stack: process.env.NODE_ENV === 'production' ? undefined : err.stack,
   });
 };
 

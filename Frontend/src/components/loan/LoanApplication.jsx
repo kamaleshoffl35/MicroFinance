@@ -8,6 +8,7 @@ import { createLoan, updateLoan, fetchLoans } from "../../redux/loanSlice";
 import AppSnackbar from "../../components/common/AppSnackbar";
 import { fetchLoanTypes } from "../../redux/loanTypeSlice";
 import { fetchTenures } from "../../redux/tenureSlice";
+import { fetchRepaymentTypes } from "../../redux/repaymentTypeSlice";
 function LoanApplication({
   selectedLoan,
   setSelectedLoan,
@@ -19,6 +20,7 @@ function LoanApplication({
   const { customers } = useSelector((state) => state.customer);
   const { loanTypes } = useSelector((state) => state.loanType);
   const { tenures } = useSelector((state) => state.tenure);
+  const { repaymentTypes } = useSelector((state) => state.repaymentType);
   const navigate = useNavigate();
 
   const [submitting, setSubmitting] = useState(false);
@@ -90,6 +92,11 @@ function LoanApplication({
   useEffect(() => {
     dispatch(fetchTenures());
   }, [dispatch]);
+  useEffect(() => {
+    if (!repaymentTypes.length) {
+      dispatch(fetchRepaymentTypes());
+    }
+  }, [dispatch, repaymentTypes.length]);
   const customer = useMemo(() => {
     return customers.find((c) => c._id === selectedCustomer);
   }, [customers, selectedCustomer]);
@@ -617,10 +624,13 @@ function LoanApplication({
                   value={repaymentType}
                   onChange={(e) => setRepaymentType(e.target.value)}
                 >
-                  <option>Monthly EMI</option>
-                  <option>Weekly EMI</option>
-                  <option>Daily Collection</option>
-                  <option>Bullet Payment</option>
+                  <option value="">Select Repayment Type</option>
+
+                  {repaymentTypes.map((item) => (
+                    <option key={item._id} value={item.repaymentTypeName}>
+                      {item.repaymentTypeName}
+                    </option>
+                  ))}
                 </Form.Select>
               </Col>
 

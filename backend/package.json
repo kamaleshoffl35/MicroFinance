@@ -8,16 +8,27 @@
     "start": "node server.js",
     "dev": "nodemon server.js"
   },
-  "keywords": ["microfinance", "customer", "mern", "express", "mongodb"],
+  "keywords": [
+    "microfinance",
+    "customer",
+    "mern",
+    "express",
+    "mongodb"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.19.2",
-    "mongoose": "^8.5.1",
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^8.6.1",
+    "express-validator": "^7.3.2",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^8.5.1",
+    "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
-    "morgan": "^1.10.0"
+    "nodemailer": "^9.0.3"
   },
   "devDependencies": {
     "nodemon": "^3.1.4"

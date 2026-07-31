@@ -7,8 +7,13 @@ import LoanApplication from "../components/loan/LoanApplication";
 import LoanTypes from "../components/loan/LoanTypes";
 import { Modal } from "react-bootstrap";
 import Tenure from "../components/loan/Tenure";
+import RepaymentType from "../components/loan/RepaymentType";
+import ManageTabs from "../components/loan/ManageTabs";
+import LoanTabs from "../components/loan/LoanTabs";
 function LoanManagement() {
   const [activeTab, setActiveTab] = useState("list");
+
+  const [manageTab, setManageTab] = useState("types");
   const [search, setSearch] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [selectedLoan, setSelectedLoan] = useState(null);
@@ -48,8 +53,17 @@ function LoanManagement() {
           setShowModal={setShowModal}
         />
       )}
-      {activeTab === "types" && <LoanTypes />}
-      {activeTab === "tenure" && <Tenure />}
+      {activeTab === "manage" && (
+        <>
+          <ManageTabs manageTab={manageTab} setManageTab={setManageTab} />
+
+          {manageTab === "types" && <LoanTypes />}
+
+          {manageTab === "tenure" && <Tenure />}
+
+          {manageTab === "repayment" && <RepaymentType />}
+        </>
+      )}
       <Modal
         show={showModal}
         onHide={() => {

@@ -11,6 +11,9 @@ const customerRoutes = require("./routes/customerRoutes");
 const loanRoutes = require("./routes/loanRoutes");
 const loanTypeRoutes = require("./routes/loanTypeRoutes");
 const tenureRoutes = require("./routes/tenureRoutes");
+const repaymentTypeRoutes = require("./routes/repaymentTypeRoutes");
+const authRoutes = require("./routes/authRoutes")
+
 const { notFound, errorHandler } = require("./middleware/errorHandler");
 
 connectDB();
@@ -48,6 +51,8 @@ app.use("/api/customers", customerRoutes);
 app.use("/api/loans", loanRoutes);
 app.use("/api/loan-types", loanTypeRoutes);
 app.use("/api/tenures", tenureRoutes);
+app.use("/api/repayment-types", repaymentTypeRoutes);
+app.use("/api/auth",authRoutes)
 
 app.use(notFound);
 app.use(errorHandler);
