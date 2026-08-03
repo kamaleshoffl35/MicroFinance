@@ -19,7 +19,7 @@ function LoanManagement() {
   const [selectedLoan, setSelectedLoan] = useState(null);
   return (
     <div className="customer-management-wrapper">
-      <h1>Loan Management</h1>
+      <h4>Loan Management</h4>
 
       <p className="text-secondary">
         Applications, approval workflow and loan books by type.

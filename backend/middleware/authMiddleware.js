@@ -1,37 +1,49 @@
-const tokenService = require('../services/tokenService');
+const User = require("../models/User");
+const tokenService = require("../services/tokenService");
 
-const ApiError = require('../utils/ApiError');
-const asyncHandler = require('../utils/asyncHandler');
-
+const ApiError = require("../utils/ApiError");
+const asyncHandler = require("../utils/asyncHandler");
 
 exports.protect = asyncHandler(async (req, res, next) => {
-  const authHeader = req.headers.authorization || '';
-  const [scheme, token] = authHeader.split(' ');
+  const authHeader = req.headers.authorization || "";
+  const [scheme, token] = authHeader.split(" ");
 
-  if (scheme !== 'Bearer' || !token) {
-    throw new ApiError(401, 'Not authenticated');
+  if (scheme !== "Bearer" || !token) {
+    throw new ApiError(401, "Not authenticated");
   }
 
   let payload;
+
   try {
     payload = tokenService.verifyAccessToken(token);
-  } catch {
-    throw new ApiError(401, 'Session expired, please log in again');
+  } catch (err) {
+    throw new ApiError(401, "Session expired, please log in again");
   }
 
-  const user = await userRepository.findById(payload.sub);
+  const user = await User.findById(payload.sub);
+
   if (!user || !user.isActive) {
-    throw new ApiError(401, 'Not authenticated');
+    throw new ApiError(401, "Not authenticated");
   }
 
-  req.user = { id: user._id.toString(), role: user.role, email: user.email, name: user.name };
+  req.user = {
+    id: user._id.toString(),
+    name: user.name,
+    email: user.email,
+    role: user.role,
+  };
+
   next();
 });
 
+exports.authorize = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user || !allowedRoles.includes(req.user.role)) {
+      return next(
+        new ApiError(403, "You do not have permission to perform this action"),
+      );
+    }
 
-exports.authorize = (...allowedRoles) => (req, res, next) => {
-  if (!req.user || !allowedRoles.includes(req.user.role)) {
-    return next(new ApiError(403, 'You do not have permission to perform this action'));
-  }
-  next();
+    next();
+  };
 };

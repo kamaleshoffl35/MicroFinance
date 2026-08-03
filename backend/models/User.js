@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
   {
@@ -9,11 +9,20 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
-      match: [/^\S+@\S+\.\S+$/, 'Invalid email format'],
+      match: [/^\S+@\S+\.\S+$/, "Invalid email format"],
     },
     password: { type: String, required: true, minlength: 8, select: false },
-    role: { type: String, enum: ['admin', 'staff', 'customer'], default: 'staff' },
-
+    role: {
+      type: String,
+      enum: ["admin", "staff", "customer"],
+      default: "staff",
+    },
+    permissions: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Permission",
+      },
+    ],
     refreshTokens: [
       {
         tokenHash: { type: String, required: true },
@@ -24,7 +33,6 @@ const userSchema = new mongoose.Schema(
       },
     ],
 
-
     passwordResetTokenHash: { type: String, select: false },
     passwordResetExpires: { type: Date, select: false },
 
@@ -33,11 +41,11 @@ const userSchema = new mongoose.Schema(
     isActive: { type: Boolean, default: true },
     lastLoginAt: { type: Date },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-userSchema.virtual('isLocked').get(function () {
+userSchema.virtual("isLocked").get(function () {
   return !!(this.lockUntil && this.lockUntil > Date.now());
 });
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model("User", userSchema);

@@ -29,6 +29,15 @@ function LoanTabs({ activeTab, setActiveTab }) {
           Manage
         </Nav.Link>
       </Nav.Item>
+
+       <Nav.Item>
+        <Nav.Link
+          eventKey="field"
+          onClick={() => setActiveTab("field")}
+        >
+          Field Verification
+        </Nav.Link>
+      </Nav.Item>
     </Nav>
   );
 }

@@ -274,3 +274,11 @@ h5{
 .customer-edit-modal .card-body{
     padding: 14px;
 }
+.user-registration-modal {
+    max-width: 690px;
+}
+
+
+.user-registration-modal .modal-content {
+    border-radius: 12px;
+}

@@ -23,7 +23,7 @@ function CustomerManagement() {
   return (
     <>
       <div className="customer-management-wrapper">
-        <h1>Customer Management</h1>
+        <h4>Customer Management</h4>
         <p className="text-secondary">
           Registration, KYC, Guarantors and Document records.
         </p>

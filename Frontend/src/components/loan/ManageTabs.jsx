@@ -33,6 +33,8 @@ function ManageTabs({ manageTab, setManageTab }) {
           Repayment Types
         </Nav.Link>
       </Nav.Item>
+
+    
     </Nav>
   );
 }

@@ -12,7 +12,10 @@ const loanRoutes = require("./routes/loanRoutes");
 const loanTypeRoutes = require("./routes/loanTypeRoutes");
 const tenureRoutes = require("./routes/tenureRoutes");
 const repaymentTypeRoutes = require("./routes/repaymentTypeRoutes");
-const authRoutes = require("./routes/authRoutes")
+const authRoutes = require("./routes/authRoutes");
+const permissionRoutes = require("./routes/permissionRoutes");
+const roleRoutes = require("./routes/roleRoutes");
+const userRoutes = require("./routes/userRoutes");
 
 const { notFound, errorHandler } = require("./middleware/errorHandler");
 
@@ -52,8 +55,10 @@ app.use("/api/loans", loanRoutes);
 app.use("/api/loan-types", loanTypeRoutes);
 app.use("/api/tenures", tenureRoutes);
 app.use("/api/repayment-types", repaymentTypeRoutes);
-app.use("/api/auth",authRoutes)
-
+app.use("/api/auth", authRoutes);
+app.use("/api/roles", roleRoutes);
+app.use("/api/permissions", permissionRoutes);
+app.use("/api/users", userRoutes);
 app.use(notFound);
 app.use(errorHandler);
 

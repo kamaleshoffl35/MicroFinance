@@ -8,13 +8,12 @@ import LoanManagement from "./pages/LoanManagement";
 
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
-import ForgotPassword from "./pages/auth/ForgotPassword"
-import ResetPassword from "./pages/auth/ResetPassword"
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
+import UsersManagement from "./pages/UsersManagement";
 import { useAuth } from "./context/AuthContext";
 
-
 function ProtectedRoute({ children }) {
-
   const { user } = useAuth();
 
   if (!user) {
@@ -24,9 +23,7 @@ function ProtectedRoute({ children }) {
   return children;
 }
 
-
 function PublicRoute({ children }) {
-
   const { user } = useAuth();
 
   if (user) {
@@ -36,15 +33,10 @@ function PublicRoute({ children }) {
   return children;
 }
 
-
 function App() {
-
   return (
     <BrowserRouter>
-
       <Routes>
-
-
         {/* Login Page */}
         <Route
           path="/login"
@@ -54,7 +46,6 @@ function App() {
             </PublicRoute>
           }
         />
-
 
         {/* Signup Page */}
         <Route
@@ -66,7 +57,7 @@ function App() {
           }
         />
 
- <Route
+        <Route
           path="/forgot-password"
           element={
             <PublicRoute>
@@ -75,7 +66,7 @@ function App() {
           }
         />
 
-         <Route
+        <Route
           path="/reset-password"
           element={
             <PublicRoute>
@@ -93,45 +84,22 @@ function App() {
             </ProtectedRoute>
           }
         >
-
           <Route index element={<Dashboard />} />
 
+          <Route path="customer" element={<CustomerManagement />} />
 
-          <Route
-            path="customer"
-            element={<CustomerManagement />}
-          />
+          <Route path="kyc-verification/:id" element={<KYCDetails />} />
 
+          <Route path="loan" element={<LoanManagement />} />
 
-          <Route
-            path="kyc-verification/:id"
-            element={<KYCDetails />}
-          />
-
-
-          <Route
-            path="loan"
-            element={<LoanManagement />}
-          />
-
-
+          <Route path="users" element={<UsersManagement />} />
         </Route>
 
-
-
         {/* Unknown URL */}
-        <Route
-          path="*"
-          element={<Navigate to="/login" replace />}
-        />
-
-
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
-
-
     </BrowserRouter>
   );
 }
-
 
 export default App;
