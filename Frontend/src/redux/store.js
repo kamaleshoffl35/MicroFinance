@@ -7,6 +7,7 @@ import repaymentTypeReducer from "./repaymentTypeSlice";
 import permissionReducer from "./permissionSlice";
 import userReducer from "./usersSlice"
 import rolesReducer from "./rolesSlice";
+import fieldVerificationReducer from "./fieldVerificationSlice";
 export const store = configureStore({
   reducer: {
     customer: customerReducer,
@@ -17,5 +18,6 @@ export const store = configureStore({
     permissions:permissionReducer,
     users:userReducer,
     roles: rolesReducer,
+    fieldVerification: fieldVerificationReducer,
   },
 });

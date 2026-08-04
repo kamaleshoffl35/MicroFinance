@@ -10,6 +10,8 @@ import Tenure from "../components/loan/Tenure";
 import RepaymentType from "../components/loan/RepaymentType";
 import ManageTabs from "../components/loan/ManageTabs";
 import LoanTabs from "../components/loan/LoanTabs";
+import FieldVerification from "../components/loan/FieldVerification";
+import FieldVerificationTable from "../components/loan/FieldVerificationTable";
 function LoanManagement() {
   const [activeTab, setActiveTab] = useState("list");
 
@@ -53,6 +55,17 @@ function LoanManagement() {
           setShowModal={setShowModal}
         />
       )}
+      {activeTab === "field" && (
+  <FieldVerification />
+)}
+{activeTab === "field-list" && (
+  <div className="mt-4">
+    <FieldVerificationTable
+      setShowModal={setShowModal}
+      setSelectedVerification={setSelectedLoan}
+    />
+  </div>
+)}
       {activeTab === "manage" && (
         <>
           <ManageTabs manageTab={manageTab} setManageTab={setManageTab} />

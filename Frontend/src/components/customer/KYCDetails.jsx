@@ -202,11 +202,11 @@ function KYCDetails({ customer, onClose }) {
           </Form.Group>
 
           <div className="text-center mt-4">
-            <Button className="me-3 px-4 add" onClick={handleApprove}>
+            <Button className="me-3 px-4 add text-white" variant="" onClick={handleApprove}>
               Approve
             </Button>
 
-            <Button className="px-4 add" onClick={handleReject}>
+            <Button className="px-4 add text-white" variant="" onClick={handleReject}>
               Reject
             </Button>
           </div>

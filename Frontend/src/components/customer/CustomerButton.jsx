@@ -3,10 +3,11 @@ import Button from "react-bootstrap/Button";
 function CustomerButton({ setActiveTab }) {
   return (
     <Button
+    variant=""
       className="w-100 add text-white"
       onClick={() => setActiveTab("registration")}
     >
-      + New Customer
+      New Customer
     </Button>
   );
 }

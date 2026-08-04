@@ -16,7 +16,7 @@ const authRoutes = require("./routes/authRoutes");
 const permissionRoutes = require("./routes/permissionRoutes");
 const roleRoutes = require("./routes/roleRoutes");
 const userRoutes = require("./routes/userRoutes");
-
+const fieldVerificationRoutes = require("./routes/fieldVerificationRoutes");
 const { notFound, errorHandler } = require("./middleware/errorHandler");
 
 connectDB();
@@ -59,6 +59,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/roles", roleRoutes);
 app.use("/api/permissions", permissionRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/field-verifications", fieldVerificationRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
